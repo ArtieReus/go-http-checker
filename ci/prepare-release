@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e -x
+
+mkdir -p release;
+
+version="1.0.0"
+echo "v$version" > release/name
+echo "v$version" > release/tag
+git -C . rev-parse HEAD > release/commitish
+
+cat > release/body <<EOF
+A release candidate of the go-http-checker.
+EOF
+
+mkdir -p release/artifacts
+cp bin/go-http-checker_* release/artifacts/
+upx release/artifacts/go-http-checker_windows.exe
+upx release/artifacts/go-http-checker_linux
+
+hub release create -a release/artifacts/go-http-checker_windows.exe -a release/artifacts/go-http-checker_linux -F release/body -t $(cat release/commitish) $(cat release/tag)
