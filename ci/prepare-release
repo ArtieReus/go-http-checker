@@ -4,7 +4,7 @@ set -e -x
 
 mkdir -p release;
 
-version="1.0.0"
+version="1.0.1"
 echo "v$version" > release/name
 echo "v$version" > release/tag
 git -C . rev-parse HEAD > release/commitish

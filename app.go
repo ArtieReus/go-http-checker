@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -73,8 +72,10 @@ func runChecker(c *cli.Context) {
 		log.Fatalf("failed to create http request: %s", err)
 	}
 	req.Header["User-Agent"] = []string{appName + " " + version}
+
 	// pretty print req
-	log.Println(formatRequest(req))
+	log.Println()
+	formatRequest(req)
 
 	// response
 	resp, err := client.Do(req)
@@ -83,52 +84,50 @@ func runChecker(c *cli.Context) {
 	}
 	defer resp.Body.Close()
 
-	log.Println(formatResponse(resp))
+	log.Println()
+	log.Println()
+	formatResponse(resp)
 }
 
-func formatResponse(resp *http.Response) string {
-	var response []string
-
-	status := fmt.Sprintf("Response: \nStatus: %v Status code: %v", resp.Status, resp.StatusCode)
-	response = append(response, status)
+func formatResponse(resp *http.Response) {
+	log.Println("RESPONSE:")
+	log.Printf("Status: %v Status code: %v", resp.Status, resp.StatusCode)
 
 	// Loop through headers
-	response = append(response, fmt.Sprintf("\nResponse Headers:"))
+	log.Println()
+	log.Println("Response Headers:")
 	for name, headers := range resp.Header {
 		name = strings.ToLower(name)
 		for _, h := range headers {
-			response = append(response, fmt.Sprintf("%v: %v", name, h))
+			log.Printf("%v: %v", name, h)
 		}
 	}
 	// print dump
-	response = append(response, fmt.Sprintf("\nDump:"))
+	log.Println()
+	log.Println("Dump:")
 	dump, err := httputil.DumpResponse(resp, true)
 	if err != nil {
 		log.Warnf("response can not be dumped: %s", err)
 	}
 
 	// add raw request
-	response = append(response, fmt.Sprintf("%q", dump))
-
-	// Return the request as a string
-	return strings.Join(response, "\n")
+	log.Printf("%q", dump)
 }
 
-func formatRequest(r *http.Request) string {
-	// Create return string
-	var request []string
+func formatRequest(r *http.Request) {
+	log.Println("REQUEST:")
 	// Add the request string
-	url := fmt.Sprintf("Request: \n%v %v %v", r.Method, r.URL, r.Proto)
-	request = append(request, url)
+	log.Printf("%v %v %v", r.Method, r.URL, r.Proto)
 	// Add the host
-	request = append(request, fmt.Sprintf("Host: %v", r.Host))
+	log.Printf("Host: %v", r.Host)
 
 	// Loop through headers
-	request = append(request, fmt.Sprintf("\nRequest Headers:"))
+	log.Println()
+	log.Println("Request Headers:")
 	for name, headers := range r.Header {
 		name = strings.ToLower(name)
 		for _, h := range headers {
-			request = append(request, fmt.Sprintf("%v: %v", name, h))
+			log.Printf("%v: %v", name, h)
 		}
 	}
 
@@ -138,21 +137,18 @@ func formatRequest(r *http.Request) string {
 		if err != nil {
 			log.Warnf("Post form could not be parsed: %s", err)
 		} else {
-			request = append(request, "\n")
-			request = append(request, r.Form.Encode())
+			log.Println(r.Form.Encode())
 		}
 	}
 
 	// print dump
-	request = append(request, fmt.Sprintf("\nDump:"))
+	log.Println()
+	log.Println("Dump:")
 	dump, err := httputil.DumpRequest(r, true)
 	if err != nil {
 		log.Warnf("request can not be dumped: %s", err)
 	}
 
 	// add raw request
-	request = append(request, fmt.Sprintf("%q", dump))
-
-	// Return the request as a string
-	return strings.Join(request, "\n")
+	log.Printf("%q", dump)
 }
