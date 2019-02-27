@@ -9,7 +9,6 @@ help:
 	@echo
 	@echo "Available targets:"
 	@echo "  * build             - build the binary, output to $(BINARY)"
-	@echo "  * build-wi          - build the binary for windows, output to $(BINARY)"
 	@echo "  * metalint          - run metalint checks"
 	@echo "  * release           - release candidate"
 
