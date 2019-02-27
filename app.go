@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -52,7 +53,8 @@ func runChecker(c *cli.Context) {
 		log.Fatalf("Url not provided")
 	}
 
-	log.Infof("Checking for URL: %s", checkURL)
+	fmt.Printf("Checking for URL: %s", checkURL)
+	fmt.Println()
 
 	// client
 	client := http.Client{
@@ -74,7 +76,7 @@ func runChecker(c *cli.Context) {
 	req.Header["User-Agent"] = []string{appName + " " + version}
 
 	// pretty print req
-	log.Println()
+	fmt.Println()
 	formatRequest(req)
 
 	// response
@@ -84,50 +86,53 @@ func runChecker(c *cli.Context) {
 	}
 	defer resp.Body.Close()
 
-	log.Println()
-	log.Println()
+	fmt.Println()
+	fmt.Println()
 	formatResponse(resp)
 }
 
 func formatResponse(resp *http.Response) {
-	log.Println("RESPONSE:")
-	log.Printf("Status: %v Status code: %v", resp.Status, resp.StatusCode)
+	fmt.Println("RESPONSE:")
+	fmt.Printf("Status: %v Status code: %v", resp.Status, resp.StatusCode)
 
 	// Loop through headers
-	log.Println()
-	log.Println("Response Headers:")
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("Response Headers:")
 	for name, headers := range resp.Header {
 		name = strings.ToLower(name)
 		for _, h := range headers {
-			log.Printf("%v: %v", name, h)
+			fmt.Printf("%v: %v\n", name, h)
 		}
 	}
 	// print dump
-	log.Println()
-	log.Println("Dump:")
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("Dump:")
 	dump, err := httputil.DumpResponse(resp, true)
 	if err != nil {
 		log.Warnf("response can not be dumped: %s", err)
 	}
 
 	// add raw request
-	log.Printf("%q", dump)
+	fmt.Printf("%q", dump)
 }
 
 func formatRequest(r *http.Request) {
-	log.Println("REQUEST:")
+	fmt.Println("REQUEST:")
 	// Add the request string
-	log.Printf("%v %v %v", r.Method, r.URL, r.Proto)
+	fmt.Printf("%v %v %v", r.Method, r.URL, r.Proto)
 	// Add the host
-	log.Printf("Host: %v", r.Host)
+	fmt.Printf("Host: %v", r.Host)
 
 	// Loop through headers
-	log.Println()
-	log.Println("Request Headers:")
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("Request Headers:")
 	for name, headers := range r.Header {
 		name = strings.ToLower(name)
 		for _, h := range headers {
-			log.Printf("%v: %v", name, h)
+			fmt.Printf("%v: %v\n", name, h)
 		}
 	}
 
@@ -137,18 +142,19 @@ func formatRequest(r *http.Request) {
 		if err != nil {
 			log.Warnf("Post form could not be parsed: %s", err)
 		} else {
-			log.Println(r.Form.Encode())
+			fmt.Println(r.Form.Encode())
 		}
 	}
 
 	// print dump
-	log.Println()
-	log.Println("Dump:")
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("Dump:")
 	dump, err := httputil.DumpRequest(r, true)
 	if err != nil {
 		log.Warnf("request can not be dumped: %s", err)
 	}
 
 	// add raw request
-	log.Printf("%q", dump)
+	fmt.Printf("%q", dump)
 }
