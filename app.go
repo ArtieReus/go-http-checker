@@ -14,7 +14,7 @@ import (
 
 var (
 	appName  = "go-http-checker"
-	version  = "1.0.0"
+	version  = "1.0.3"
 	checkURL = ""
 )
 
@@ -93,11 +93,9 @@ func runChecker(c *cli.Context) {
 
 func formatResponse(resp *http.Response) {
 	fmt.Println("RESPONSE:")
-	fmt.Printf("Status: %v Status code: %v", resp.Status, resp.StatusCode)
+	fmt.Printf("Status: %v, Status code: %v\n\n", resp.Status, resp.StatusCode)
 
 	// Loop through headers
-	fmt.Println()
-	fmt.Println()
 	fmt.Println("Response Headers:")
 	for name, headers := range resp.Header {
 		name = strings.ToLower(name)
@@ -105,30 +103,25 @@ func formatResponse(resp *http.Response) {
 			fmt.Printf("%v: %v\n", name, h)
 		}
 	}
+
 	// print dump
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("Dump:")
+	fmt.Println("\nResponse dump:")
 	dump, err := httputil.DumpResponse(resp, true)
 	if err != nil {
-		log.Warnf("response can not be dumped: %s", err)
+		log.Warnf("response can't be dumped: %s", err)
 	}
-
-	// add raw request
-	fmt.Printf("%q", dump)
+	fmt.Printf("%q\n", dump)
 }
 
 func formatRequest(r *http.Request) {
 	fmt.Println("REQUEST:")
 	// Add the request string
-	fmt.Printf("%v %v %v", r.Method, r.URL, r.Proto)
+	fmt.Printf("%v %v %v\n", r.Method, r.URL, r.Proto)
 	// Add the host
-	fmt.Printf("Host: %v", r.Host)
+	fmt.Printf("Host: %v\n", r.Host)
 
 	// Loop through headers
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("Request Headers:")
+	fmt.Println("\nRequest Headers:")
 	for name, headers := range r.Header {
 		name = strings.ToLower(name)
 		for _, h := range headers {
@@ -142,14 +135,13 @@ func formatRequest(r *http.Request) {
 		if err != nil {
 			log.Warnf("Post form could not be parsed: %s", err)
 		} else {
+			fmt.Println("Post data:")
 			fmt.Println(r.Form.Encode())
 		}
 	}
 
 	// print dump
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("Dump:")
+	fmt.Println("\nRequest dump:")
 	dump, err := httputil.DumpRequest(r, true)
 	if err != nil {
 		log.Warnf("request can not be dumped: %s", err)
